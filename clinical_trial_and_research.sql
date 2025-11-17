@@ -285,23 +285,67 @@ INSERT INTO Trial_Outcomes (outcome_id, visit_id, outcome_type, outcome_value, n
 
 
 DELIMITER $$
--- Procedure
+-- Function
+DELIMITER //
 
-CREATE PROCEDURE GetResponseRate(IN trialId INT)
+CREATE FUNCTION fn_get_response_rate (trialID INT)
+RETURNS DECIMAL(5, 2)
+READS SQL DATA
 BEGIN
-  SELECT 
-    t.trial_name,
-    COUNT(DISTINCT CASE WHEN o.outcome_value IN ('Improved', 'Responded', 'Positive', 'High Response') THEN e.patient_id END)
-      / COUNT(DISTINCT e.patient_id) * 100 AS response_rate_percentage
-  FROM Clinical_Trials t
-  JOIN Patient_Enrollment e ON t.trial_id = e.trial_id
-  LEFT JOIN Visits v ON e.enrollment_id = v.enrollment_id
-  LEFT JOIN Trial_Outcomes o ON v.visit_id = o.visit_id
-  WHERE t.trial_id = trialId
-  GROUP BY t.trial_id;
-END$$
+    DECLARE total_enrolled INT;
+    DECLARE total_responders INT;
+    DECLARE response_percentage DECIMAL(5, 2);
+
+    SELECT COUNT(enrollment_id)
+    INTO total_enrolled
+    FROM Patient_Enrollment
+    WHERE trial_id = trialID;
+
+    SELECT COUNT(DISTINCT T1.enrollment_id)
+    INTO total_responders
+    FROM Patient_Enrollment AS T1
+    JOIN Visits AS T2 ON T1.enrollment_id = T2.enrollment_id
+    JOIN Trial_Outcomes AS T3 ON T2.visit_id = T3.visit_id
+    WHERE T1.trial_id = trialID
+      AND T3.outcome_value IN ('Responded', 'Positive', 'High Response', 'Improved');
+
+    IF total_enrolled > 0 THEN
+        SET response_percentage = (total_responders * 100.0) / total_enrolled;
+    ELSE
+        SET response_percentage = 0.00;
+    END IF;
+
+    RETURN response_percentage;
+END //
 
 DELIMITER ;
+
+-- Procedure
+DELIMITER //
+
+CREATE PROCEDURE proc_auto_schedule_visits (
+    IN enrollmentID INT,
+    IN starting_date DATE,
+    IN num_visits INT,
+    IN interval_days INT
+)
+BEGIN
+    DECLARE i INT DEFAULT 1;
+    DECLARE next_scheduled_date DATE;
+
+    SET next_scheduled_date = DATE_ADD(starting_date, INTERVAL interval_days DAY);
+
+    WHILE i <= num_visits DO
+        INSERT INTO Visits (enrollment_id, visit_number, scheduled_date, actual_date, status, notes) VALUES
+        (enrollmentID, i + 1, next_scheduled_date, NULL, 'Scheduled', CONCAT('Auto-scheduled follow-up visit #', i + 1, ' (', interval_days, ' day interval)'));
+
+        SET next_scheduled_date = DATE_ADD(next_scheduled_date, INTERVAL interval_days DAY);
+        SET i = i + 1;
+    END WHILE;
+END //
+
+DELIMITER ;
+
 
 -- Trigger
 DELIMITER $$

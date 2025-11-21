@@ -88,3 +88,9 @@ The following files are included in this repository:
 6.  **`GUI_Screenshots/`**: Folder containing screenshots of CRUD operations and advanced feature demonstrations (e.g., response rate widget, trigger error messages).
 
 [View All Project Screenshots (CRUD, Triggers, Reports)](GUI_Screenshots/)
+
+---
+
+## Authors
+1. Nishita Singh (ohnonyx)
+2. Nithya Prashaanthi R. (Nithya-1385)

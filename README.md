@@ -84,7 +84,8 @@ The following files are included in this repository:
     [View the Complete SQL Database File](clinical_trial_and_research.sql)
 4.  **`ER_Diagram.png`**: The complete Entity-Relationship Diagram.
 
-   ![Clinical Trial ER Diagram](ClinicalTrialER.png)
+   <img width="2061" height="2204" alt="updated ER" src="https://github.com/user-attachments/assets/ff9de5d7-8916-4cde-8a88-868ae25c2dcc" />
+
 6.  **`GUI_Screenshots/`**: Folder containing screenshots of CRUD operations and advanced feature demonstrations (e.g., response rate widget, trigger error messages).
 
 [View All Project Screenshots (CRUD, Triggers, Reports)](GUI_Screenshots/)

@@ -94,4 +94,4 @@ The following files are included in this repository:
 
 ## Authors
 1. Nishita Singh (ohnonyx)
-2. Nithya Prashaanthi R. (Nithya-1385)
+2. Nithya Prashaanthi R. (nithya-1385)
